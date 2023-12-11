@@ -42,7 +42,7 @@ export const signin = async (req, res, next) => {
       .status(200)
       .json(validUser);
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 export const google = async (req, res, next) => {
