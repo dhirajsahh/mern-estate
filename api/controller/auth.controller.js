@@ -26,6 +26,12 @@ export const signup = async (req, res, next) => {
 };
 export const signin = async (req, res, next) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "All field are required",
+    });
+  }
   try {
     let validUser = await User.findOne({ email });
     if (!validUser) {
@@ -74,6 +80,17 @@ export const google = async (req, res, next) => {
         .status(200)
         .json(newUser);
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const signOut = async (req, res, next) => {
+  try {
+    res
+      .clearCookie("access_token")
+      .status(200)
+      .json("User has been logged Out");
   } catch (error) {
     next(error);
   }
