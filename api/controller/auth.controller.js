@@ -18,6 +18,7 @@ export const signup = async (req, res, next) => {
       email,
       password: hashedPassword,
     });
+    newUser.password = undefined;
     return res.status(201).json(newUser);
   } catch (error) {
     next(error);
