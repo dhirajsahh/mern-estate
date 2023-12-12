@@ -10,6 +10,13 @@ export const signup = async (req, res, next) => {
       message: "All field are required",
     });
   }
+  const existingUser = await User.findOne({ email });
+  if (!existingUser) {
+    return res.status(400).json({
+      success: false,
+      message: "You are existing user sign in",
+    });
+  }
   const hashedPassword = bcryptjs.hashSync(password, 10);
 
   try {
@@ -26,6 +33,7 @@ export const signup = async (req, res, next) => {
 };
 export const signin = async (req, res, next) => {
   const { email, password } = req.body;
+  console.log(email, password);
   if (!email || !password) {
     return res.status(400).json({
       success: false,
