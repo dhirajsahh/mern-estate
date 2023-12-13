@@ -1,7 +1,7 @@
 import User from "../models/user.model.js";
 import { errorHandler } from "../utils/error.js";
 import bcryptjs from "bcryptjs";
-
+import Listing from "../models/listing.model.js";
 export const test = async (req, res, next) => {
   return res.status(200).json({
     message: "api is working",
@@ -40,6 +40,18 @@ export const deleteUser = async (req, res, next) => {
   try {
     const deleteUser = await User.findByIdAndDelete(req.params.id);
     res.clearCookie("access_token").status(200).json("User has been deleted");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const listing = async (req, res, next) => {
+  try {
+    if (req.user.id == req.params.id) {
+      const getlisting = await Listing.find({ useRef: req.user.id });
+      return res.status(200).json(getlisting);
+    }
+    return next(errorHandler(401, "You can only view your own listing"));
   } catch (error) {
     next(error);
   }
