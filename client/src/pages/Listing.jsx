@@ -6,8 +6,11 @@ import { Navigation } from "swiper/modules";
 import "swiper/css/bundle";
 import { FaBath, FaBed, FaChair, FaParking, FaShare } from "react-icons/fa";
 import { FaMapMarkerAlt } from "react-icons/fa";
-
+import { useSelector } from "react-redux";
+import Contact from "../components/Contact";
 const Listing = () => {
+  const [contact, setContact] = useState(false);
+  const { currentUser } = useSelector((state) => state.user);
   SwiperCore.use([Navigation]);
   const [copied, setCopied] = useState(false);
   const [listing, setListing] = useState(null);
@@ -45,7 +48,6 @@ const Listing = () => {
       {listing && !loading && !error && (
         <div>
           <Swiper navigation>
-            {console.log(listing.imageUrls)}
             {listing.imageUrls.map((url) => (
               <SwiperSlide key={url}>
                 <div
@@ -90,7 +92,7 @@ const Listing = () => {
               <FaMapMarkerAlt className="text-green-700" />
               {listing.address}
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
               <p className="bg-red-800 w-full max-w-[200px] text-white text-center p-1 rounded-md  ">
                 {listing.type === "rent" ? "For Rent" : "For sale"}
               </p>
@@ -126,6 +128,15 @@ const Listing = () => {
                 {listing.furnished ? "Furnished" : "Unfurnished"}
               </li>
             </ul>
+            {currentUser && listing.useRef !== currentUser._id && !contact && (
+              <button
+                onClick={() => setContact(true)}
+                className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-90"
+              >
+                Contact Landlord
+              </button>
+            )}
+            {contact && <Contact listing={listing} />}
           </div>
         </div>
       )}
