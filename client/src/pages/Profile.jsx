@@ -32,6 +32,7 @@ const Profile = () => {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [showListingError, setShowListingError] = useState();
   const [showListing, setShowListing] = useState([]);
+  const [getListing, setGetListing] = useState(false);
 
   useEffect(() => {
     if (file) {
@@ -118,6 +119,7 @@ const Profile = () => {
   }
   const handleShowListing = async () => {
     setShowListingError(false);
+    setGetListing(true);
     const res = await fetch(`/api/user/listing/${currentUser._id}`);
     const data = await res.json();
     setShowListing(data);
@@ -125,6 +127,7 @@ const Profile = () => {
       setShowListingError(true);
       return;
     }
+    setGetListing(false);
   };
   const handleListingDelete = async (listingId) => {
     try {
@@ -227,7 +230,11 @@ const Profile = () => {
       <p className="text-green-700 mt-5">
         {updateSuccess ? "User is updated successfully" : ""}
       </p>
-      <button onClick={handleShowListing} className="text-green-700 w-full">
+      <button
+        disabled={getListing}
+        onClick={handleShowListing}
+        className="text-green-700 w-full disabled:opacity-80"
+      >
         Show Listing
       </button>
       <p>{showListingError ? "Error showing listing" : ""}</p>
@@ -262,7 +269,9 @@ const Profile = () => {
                   >
                     Delete
                   </button>
-                  <button className="text-green-700 uppercase">Edit</button>
+                  <Link to={`/update-listing/${listing._id}`}>
+                    <button className="text-green-700 uppercase">Edit</button>
+                  </Link>
                 </div>
               </div>
             );

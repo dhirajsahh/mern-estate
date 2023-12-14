@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getDownloadURL,
   getStorage,
@@ -7,9 +7,10 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const CreateListing = () => {
+const UpdateListing = () => {
+  const params = useParams();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
   const [files, setFiles] = useState([]);
@@ -31,6 +32,20 @@ const CreateListing = () => {
   const [error, setError] = useState();
   const [imageUploadError, setImageUploadError] = useState(false);
   const [uploading, setUploading] = useState(false);
+  useEffect(() => {
+    const fetchListing = async () => {
+      const listingId = params.listingId;
+      const res = await fetch(`/api/listing/get/${listingId}`);
+      const data = await res.json();
+
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
+      setFormData(data);
+    };
+    fetchListing();
+  }, []);
   const handleImageSubmit = () => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
       setUploading(true);
@@ -108,11 +123,11 @@ const CreateListing = () => {
     try {
       if (formData.imageUrls.length < 1)
         return setError("You must upload at least one image");
-      if (+formData.regularPrice < +formData.discountPrice) {
+      if (formData.regularPrice < formData.discountPrice) {
         setError("Discount price should be less than regular price");
       }
       setLoading(true);
-      const res = await fetch("/api/listing/create", {
+      const res = await fetch(`/api/listing/update/${params.listingId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -129,7 +144,7 @@ const CreateListing = () => {
   return (
     <main className="p-3 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">
-        Create a Listing
+        Update a Listing
       </h1>
       <form className="flex flex-col sm:flex-row gap-4" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-4 flex-1">
@@ -151,7 +166,7 @@ const CreateListing = () => {
             className="border rounded-lg p-3 focus:outline-none "
             required
             onChange={handleChange}
-            value={formData.descritption}
+            value={formData.description}
           />
           <input
             type="text"
@@ -332,7 +347,7 @@ const CreateListing = () => {
             disabled={uploading || loading}
             className="p-3 bg-slate-700 text-white rounded-lg uppercase disabled:opacity-90"
           >
-            Create Listing
+            Update listing
           </button>
           <p className="text-red-700">{error && error}</p>
         </div>
@@ -341,4 +356,4 @@ const CreateListing = () => {
   );
 };
 
-export default CreateListing;
+export default UpdateListing;
