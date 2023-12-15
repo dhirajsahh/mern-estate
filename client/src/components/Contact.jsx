@@ -13,7 +13,9 @@ const Contact = ({ listing }) => {
         const res = await fetch(`/api/user/${listing.useRef}`);
         const data = await res.json();
         setLandlord(data);
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
     };
     fetchLandlord();
   }, [listing.useRef]);
